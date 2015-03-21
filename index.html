@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body >
+    <canvas id="life" width="1000" height="1000"></canvas>
+	<button onclick="pause()">Pause</button><button onclick="play()">Play</button>
+    <script>
+      var canvas = document.getElementById('life');
+      var ctx = canvas.getContext('2d');
+      canvas.addEventListener('click', on_canvas_click, false);
+      var map = new Array();
+      var prevMap;
+      initMap()
+      function initMap() {
+      	map = new Array();
+
+      	for (var x = 0; x <= 100; x++) {
+      		map[x] = new Array();
+      		for (var y = 0; y <= 100; y++) {
+      			map[x][y] = false;
+      		}
+      	}
+      }
+      function update() {
+      	prevMap = map;
+      	initMap();
+      	for (var x = 0; x <= 100; x++) {
+      		for (var y = 0; y <= 100; y++) {
+      			var count = neighbourCount(x, y)
+      				if (count < 2 && prevMap[x][y]) {
+      					map[x][y] = false;
+      				} else if ((count == 2 || count == 3) && prevMap[x][y]) {
+      					map[x][y] = true;
+      				} else if (count > 3 && prevMap[x][y]) {
+      					map[x][y] = false;
+      				} else if (count == 3 && !prevMap[x][y]) {
+      					map[x][y] = true;
+      				}
+
+      		}
+      	}
+      }
+      map[5][5] = true;
+      map[5][6] = true;
+      map[5][7] = true;
+
+      //map[6][7] = true;
+      function neighbourCount(x, y) {
+      	var total = 0
+      		for (var x2 = -1; x2 <= 1; x2++) {
+      			for (var y2 = -1; y2 <= 1; y2++) {
+      				if (x + x2 == -1 || y + y2 == -1) {
+      					continue;
+      				}
+      				if (x + x2 > map.length - 1 || y + y2 > map.length - 1) {
+      					continue;
+      				}
+      				if (prevMap[x + x2][y + y2]) {
+      					if (!(x2 == 0 && y2 == 0)) {
+      						total++;
+      					}
+      				}
+      			}
+      		}
+      		//if(total!=0)
+      		//	console.log(total);
+      		return total;
+      }
+      function on_canvas_click(ev) {
+      	var x = ev.clientX - canvas.offsetLeft;
+      	var y = ev.clientY - canvas.offsetTop;
+      	//console.log(Math.floor(x / 10) + ":" + Math.floor(y / 10));
+      	addCell(Math.floor(x / 10), Math.floor(y / 10));
+      }
+      function addCell(x, y) {
+      	console.log(neighbourCount(x, y));
+      	map[x][y] = true;
+      	ctx.fillRect(x * 10, y * 10, 10, 10);
+      	ctx.stroke();
+      }
+      function draw() {
+      	canvas.width = canvas.width;
+      	for (var x = 0; x <= 100; x++) {
+      		for (var y = 0; y <= 100; y++) {
+      			if (map[x][y]) {
+      				ctx.fillRect(x * 10, y * 10, 10, 10);
+      				ctx.stroke();
+      			}
+      		}
+      	}
+      }
+      function loop() {
+      	update();
+      	draw();
+      }
+      function pause() {
+      	clearInterval(interval);
+      }
+      function play() {
+      	interval = setInterval(loop, 1000 / 15);
+      }
+      loop();
+      var interval = setInterval(loop, 1000 / 15);
+    </script>
+  </body>
+</html>      
